@@ -52,6 +52,7 @@ function Square(props) {
       this.state = {
         history : [{
           squares: Array(9).fill(null),
+          lastPosition :[null,null]
         }],
         xIsNext:true,
         stepNumber:0,
@@ -60,6 +61,7 @@ function Square(props) {
 
     jumpTo(index){
       this.setState({
+        history:this.state.history.slice(0,index+1),
         stepNumber:index,
         xIsNext:(index%2)===0,
       });
@@ -72,9 +74,11 @@ function Square(props) {
       if (calculateWinner(squares) || squares[i]) {
         return;
       }
+      let row = (Math.floor(i/3))+1;
+      let col = (i%3) + 1
       squares[i]=(this.state.xIsNext?"X":"O");
       this.setState({
-        history:history.concat([{squares:squares}]),
+        history:history.concat([{squares:squares,lastPosition:[row,col]}]),
         stepNumber:history.length,
         xIsNext:!this.state.xIsNext,
       })
@@ -86,7 +90,7 @@ function Square(props) {
       const winner = calculateWinner(current.squares);
 
       const moves = history.map((step,index)=>{
-        const desc = index ? "Go to move #"+ index:"Go to game start";
+        const desc = index ? "Go to move #"+ index  + `(${step.lastPosition})`:"Go to game start";
         return(
           <li key = {index}>
             <button onClick={()=>this.jumpTo(index)}>{desc}</button>
