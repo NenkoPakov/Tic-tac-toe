@@ -52,24 +52,22 @@ function Square(props) {
       this.state = {
         history : [{
           squares: Array(9).fill(null),
-          lastPosition :[null,null]
+          position :[null,null]
         }],
         xIsNext:true,
-        stepNumber:0,
       }
     }
 
     jumpTo(index){
       this.setState({
         history:this.state.history.slice(0,index+1),
-        stepNumber:index,
         xIsNext:(index%2)===0,
       });
     }
 
     handleClick(i){
-    const history = this.state.history.slice(0,this.state.stepNumber+1);
-    const current = history[this.state.stepNumber];
+    const history = this.state.history;
+    const current = history[history.length-1];
     const squares = current.squares.slice();
       if (calculateWinner(squares) || squares[i]) {
         return;
@@ -77,9 +75,9 @@ function Square(props) {
       let row = (Math.floor(i/3))+1;
       let col = (i%3) + 1
       squares[i]=(this.state.xIsNext?"X":"O");
+
       this.setState({
-        history:history.concat([{squares:squares,lastPosition:[row,col]}]),
-        stepNumber:history.length,
+        history:history.concat([{squares:squares,position:[row,col]}]),
         xIsNext:!this.state.xIsNext,
       })
     }
@@ -90,10 +88,12 @@ function Square(props) {
       const winner = calculateWinner(current.squares);
 
       const moves = history.map((step,index)=>{
-        const desc = index ? "Go to move #"+ index  + `(${step.lastPosition})`:"Go to game start";
+        const desc = index ? "Go to move #"+ index  + `(${step.position})`:"Go to game start";
+
+        const fontWeightStyle = index===history.length-1?"bold":"";
         return(
           <li key = {index}>
-            <button onClick={()=>this.jumpTo(index)}>{desc}</button>
+            <button style={{fontWeight:fontWeightStyle}} onClick={()=>this.jumpTo(index)}>{desc}</button>
           </li>
         )
       })
